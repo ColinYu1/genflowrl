@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="GenFlowRL: Shaping Rewards with Generative Object-Centric Flow in Visual Reinforcement Learning">
+  <meta name="keywords" content="GenFlowRL, reinforcement learning, visual learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GenFlowRL: Shaping Rewards with Generative Object-Centric Flow in Visual Reinforcement Learning</title>
+
+  <!-- Preconnect for better performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  
+  <link rel="icon" type="image/svg+xml" href="./static/images/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="./static/images/favicon.ico">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <style>
+    :root {
+      --primary-blue: #2563eb;
+      --accent-blue: #3b82f6;
+      --light-blue: #dbeafe;
+      --dark-blue: #1e40af;
+      --gradient-start: #667eea;
+      --gradient-end: #764ba2;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    /* Enhanced navbar with modern styling */
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand {
+      padding: 0 1rem;
+    }
+
+    .navbar-item {
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-item:hover {
+      background: var(--light-blue);
+      color: var(--primary-blue);
+    }
+
+    /* Hero section with gradient background */
+    .hero-section {
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      color: white;
+      padding: 4rem 0 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.15"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.15"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.15"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .publication-title {
+      font-weight: 700;
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .name {
+      background: linear-gradient(45deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      text-shadow: none;
+      font-variant: small-caps;
+    }
+
+
+    .author-block a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .author-block a:hover {
+      color: white;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Video section with enhanced styling - narrower */
+    .video-hero {
+      background: white;
+      padding: 3rem 0;
+      position: relative;
+    }
+
+    .video-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-medium);
+      aspect-ratio: 16 / 9;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .video-container:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 16px;
+    }
+
+    .video-description {
+      max-width: 600px; 
+      margin: 2rem auto 0;
+      padding: 0 1rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    /* Teaser section with enhanced visual flow - narrower */
+    .teaser-section {
+      background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+      padding: 4rem 0;
+      position: relative;
+    }
+
+    .teaser-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    }
+
+    .teaser-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+      max-width: 700px; 
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .teaser-image {
+      width: 100%;
+      max-width: 700px; 
+      border-radius: 20px;
+      box-shadow: var(--shadow-medium);
+      transition: transform 0.3s ease;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .teaser-image:hover {
+      transform: scale(1.02);
+    }
+
+    .teaser-description {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-color);
+      max-width: 650px; 
+      text-align: left;
+    }
+
+    /* Button enhancements */
+    .publication-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .button.is-rounded {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .button.is-rounded:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Section styling improvements */
+    .content-section {
+      background: white;
+      margin: 2rem 0;
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 2px;
+    }
+
+    /* Enhanced responsive design */
+    @media screen and (max-width: 768px) {
+      .hero-section {
+        padding: 2rem 0 1.5rem;
+      }
+
+      .hero-content {
+        padding: 0 1.5rem;
+      }
+
+      .publication-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .video-hero {
+        padding: 2rem 0;
+      }
+
+      .video-container {
+        margin: 0 1rem;
+        border-radius: 12px;
+        max-width: calc(100% - 2rem);
+      }
+
+      .video-description {
+        font-size: 1rem;
+        margin-top: 1.5rem;
+        max-width: calc(100% - 2rem);
+      }
+
+      .teaser-section {
+        padding: 2rem 0;
+      }
+
+      .teaser-content {
+        padding: 0 1.5rem;
+        max-width: calc(100% - 3rem);
+      }
+
+      .teaser-description {
+        margin: 0 0;
+        padding: 1.5rem;
+        max-width: 100%;
+      }
+
+      .publication-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .button.is-rounded {
+        width: 200px;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .content-wrapper {
+        padding: 0 1.5rem;
+      }
+    }
+
+    @media screen and (min-width: 769px) and (max-width: 1024px) {
+      .teaser-content {
+        max-width: 600px;
+      }
+      
+      .teaser-image {
+        max-width: 600px;
+      }
+      
+      .video-container {
+        max-width: 500px;
+      }
+      
+      .video-description {
+        max-width: 500px;
+      }
+    }
+
+    @media screen and (min-width: 1025px) {
+      .teaser-content {
+        max-width: 700px;
+      }
+    }
+
+    /* Enhanced image responsiveness and centering - narrower containers */
+    .responsive-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      margin: 0 auto;
+      max-width: 600px; 
+    }
+
+    /* Smooth animations */
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Content sections styling - narrower content */
+    .abstract-section, .method-section, .visualization-section, .downstream-section {
+      background: white;
+      padding: 3rem 0;
+      position: relative;
+    }
+
+    .abstract-section::before, .method-section::before, .visualization-section::before, .downstream-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    }
+
+    .content-wrapper {
+      max-width: 1000px; 
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Typography improvements */
+    .content p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .subtitle.is-5 {
+      color: var(--primary-blue);
+      font-weight: 600;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Enhanced GIF and image containers - narrower and centered */
+    .gif-container, .image-container {
+      text-align: center;
+      margin: 2rem auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 720px; 
+    }
+
+    .gif-container img, .image-container img {
+      border-radius: 12px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.3s ease;
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .gif-container img:hover, .image-container img:hover {
+      transform: scale(1.02);
+    }
+
+    /* Ensure GIF images loop properly */
+    img[src*=".gif"] {
+      animation-play-state: running !important;
+      will-change: auto !important;
+    }
+
+  
+    #BibTeX {
+      background: #f8fafc;
+      border-radius: 16px;
+      margin: 2rem auto;
+      padding: 2rem;
+      max-width: 700px;
+      text-align: left;
+    }
+    
+    #BibTeX h2 {
+      text-align: center;
+    }
+    
+    #BibTeX pre {
+      background: white;
+      border: 1px solid var(--border-color, #e2e8f0);
+      border-radius: 8px;
+      padding: 1.2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      white-space: pre; 
+      line-height: 1.6;
+      color: #1e293b;
+    }
+
+
+
+    /* Footer styling */
+    .footer {
+      background: var(--text-primary);
+      color: white;
+      padding: 3rem 0 2rem;
+      margin-top: 4rem;
+    }
+    
+    .footer a {
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      color: white;
+    }
+    
+    .icon-link {
+      margin: 0 0.5rem;
+      font-size: 1.5rem;
+    }
+
+
+    /* Center all images by default with size constraints */
+    img {
+      display: block;
+      margin: 0 auto;
+      max-width: 600px; 
+      height: auto;
+    }
+
+
+    .narrow-content {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .extra-narrow-content {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+  </style>
+</head>
+<body>
+  
+<!-- Hero Section with Title and Authors -->
+<section class="hero-section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column has-text-centered hero-content">
+        <h1 class="publication-title fade-in">
+          <span class="name">GenFlowRL</span>: Shaping Rewards with Generative Object-Centric Flow in Visual Reinforcement Learning
+        </h1>
+
+        <div class="is-size-5 publication-authors fade-in">
+          <span class="author-block">
+            <a href="https://colinyu1.github.io/">Kelin Yu*</a>,
+          </span>
+          <span class="author-block">
+            <a href="https://sheng-eatamath.github.io/">Sheng Zhang*</a>,
+          </span>
+          <span class="author-block">
+            Harshit Soora</a>,
+          </span>
+          <span class="author-block">
+            <a href="https://furong-huang.com/">Furong Huang</a>,
+          </span>
+          <span class="author-block">
+            <a href="https://www.cs.umd.edu/~heng/">Heng Huang</a>,
+          </span>
+          <span class="author-block">
+            <a href="https://tokekar.com/">Pratap Tokekar</a>,
+          </span>
+          <span class="author-block">
+            <a href="https://ruohangao.github.io/">Ruohan Gao</a>
+          </span>
+        </div>
+
+        <div class="is-size-5 publication-authors">
+          <span class="author-block">University of Maryland</span>
+        </div>
+        <div class="is-size-6 has-text-centered" style="color: rgba(255, 255, 255, 0.8); margin-top: 0.5rem;">
+          * Indicates equal contribution<br>
+        </div>
+
+        <div class="publication-links fade-in">
+          <span class="link-block">
+            <a href="https://arxiv.org/pdf/2505.20498"
+               class="external-link button is-normal is-rounded">
+              <span class="icon">
+                  <i class="fas fa-file-pdf"></i>
+              </span>
+              <span>Paper</span>
+            </a>
+          </span>
+          <span class="link-block">
+            <a href="https://arxiv.org/abs/2505.20498"
+               class="external-link button is-normal is-rounded">
+              <span class="icon">
+                  <i class="ai ai-arxiv"></i>
+              </span>
+              <span>arXiv</span>
+            </a>
+          </span>
+          <span class="link-block">
+            <a class="external-link button is-normal is-rounded" disabled>
+              <span class="icon">
+                <i class="fab fa-twitter"></i>
+              </span>
+              <span>Twitter</span>
+            </a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Video Section - Now at the top -->
+<section class="video-hero fade-in">
+  <div class="container is-max-desktop">
+    <div class="has-text-centered">
+      <div class="video-container">
+        <iframe 
+          src="https://www.youtube.com/embed/ohhBsjapZpE" 
+          title="GenFlowRL Introduction Video"
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Teaser Section -->
+<section class="teaser-section fade-in">
+  <div class="container is-max-desktop">
+    <div class="teaser-content">
+      <img src="./static/images/teaser.png" alt="GenFlowRL Teaser" class="teaser-image responsive-image" />
+      <div class="teaser-description">
+        <p>
+          <strong>Illustration of our GenFlowRL framework, </strong> which guides visuomotor RL policy by taking the generative object-centric flow as task motion prior (<strong>Right</strong>).
+          In our proposed hybrid reward model, dense flow matching between online trajectories and flow prior, synergizing with sparse state-aware reward, facilitates efficient, robust, and generalizable policy learning.
+          Our extensive evaluation includes 10 challenging simulation manipulation tasks (<strong>Fig.a</strong>) and real-world cross-embodiment reward matchness probing experiments (<strong>Fig.b</strong>).
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Abstract Section -->
+<section class="abstract-section">
+  <div class="content-wrapper">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="section-title">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Recent advances have shown that video generation models can enhance robot learning by deriving effective robot actions through inverse dynamics. However, these methods heavily depend on the quality of generated data and struggle with fine-grained manipulation due to the lack of environment feedback. While video-based reinforcement learning improves policy robustness, it remains constrained by the uncertainty of video generation and the challenges of collecting large-scale robot datasets for training diffusion models. To address these limitations, we propose <span class="name" style="color: var(--primary-blue);">GenFlowRL</span>, which derives shaped rewards from generated flow trained from easy-to-collect cross-embodiment datasets. This enables learning generalizable and robust policies from expert demonstrations using low-dimensional, object-centric features. Experiments on 10 manipulation tasks, both in simulation and real-world cross-embodiment evaluations, demonstrate that <span class="name" style="color: var(--primary-blue);">GenFlowRL</span> effectively leverages manipulation features extracted from generated object-centric flow, consistently achieving superior performance across diverse and challenging scenarios.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Method Section -->
+<section class="method-section">
+  <div class="content-wrapper">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="section-title">Method Overview</h2>
+        <div class="content has-text-justified">
+          <p>
+            <strong>Architectural overview of our proposed <span class="name" style="color: var(--primary-blue);">GenFlowRL</span> framework</strong>, which encompasses our flow generation process (<strong>left</strong>), flow-derived policy learning (<strong>middle</strong>), and inference stage (<strong>right</strong>).
+          </p>
+        </div>
+
+        <div class="image-container">
+          <img src="./static/images/framework.png" alt="GenFlowRL Framework" class="responsive-image">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Visualization Section -->
+<section class="visualization-section">
+  <div class="content-wrapper">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="section-title">Evaluations</h2>
+
+        <h3 class="subtitle is-5">Simulation Tasks</h3>
+        <div class="content has-text-justified">
+          <p>
+            We conduct experiments with five challenging contact-rich manipulation and deformable manipulation tasks from the previous work Im2Flow2Act, where we compare our method with the baseline method Im2Flow2Act and other flow-based imitation learning algorithm.
+          </p>
+          <div class="image-container">
+            <img src="./static/images/flow2act.gif" alt="Comparison with other methods" class="responsive-image">
+          </div>
+        </div>
+
+        <h3 class="subtitle is-5">Comparison with Baseline Models</h3>
+        <div class="content has-text-justified">
+          <p>
+            We conduct experiments with five contact-rich manipulation tasks from the MetaWorld benchmark, where we compare our method with other video-based reward shaping methods.
+          </p>
+          <div class="image-container">
+            <img src="./static/images/metaworld.gif" alt="Baseline comparison" class="responsive-image">
+          </div>
+        </div>
+
+        <h3 class="subtitle is-5">Real-world human hand flow-based reward shaping</h3>
+        <div class="content has-text-justified">
+          <p>
+            We conduct real-world experiments to evaluate the effectiveness of the delta-flow-derived reward shaping method for cross-embodiment human hand demonstrations.
+          </p>
+          <div class="gif-container">
+            <img src="./static/images/real.gif" alt="Force and position control demonstration" class="responsive-image" style="max-width: 100%;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BibTeX Section -->
+<section class="section" id="BibTeX">
+  <div class="content-wrapper">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="section-title has-text-centered">BibTeX</h2>
+        <pre><code>@article{yu2025genflowrl,
+  title={GenFlowRL: Shaping Rewards with Generative Object-Centric Flow in Visual Reinforcement Learning},
+  author={Yu, Kelin and Zhang, Sheng and Soora, Harshit and Huang, Furong and Huang, Heng and Tokekar, Pratap and Gao, Ruohan},
+  journal={arXiv preprint arXiv:2505.20498},
+  year={2025}
+}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fitvids/1.2.0/jquery.fitvids.min.js"></script>
+
+<script>
+  // Navbar burger functionality for mobile
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get all "navbar-burger" elements
+    const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+    // Add a click event on each of them
+    navbarBurgers.forEach(el => {
+      el.addEventListener('click', () => {
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const targetElement = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        targetElement.classList.toggle('is-active');
+      });
+    });
+
+    // Initialize FitVids for responsive video
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn.fitVids !== 'undefined') {
+      jQuery('.video-container').fitVids();
+    }
+
+    // Force GIF images to reload and loop properly
+    const gifImages = document.querySelectorAll('img[src*=".gif"]');
+    gifImages.forEach(img => {
+      // Force reload the GIF to ensure it loops
+      const originalSrc = img.src;
+      img.onload = function() {
+        // Ensure the image loops by refreshing it periodically
+        setTimeout(() => {
+          if (img.src === originalSrc) {
+            img.src = '';
+            img.src = originalSrc;
+          }
+        }, 100);
+      };
+      
+      // Ensure the image is visible and not affected by CSS transitions
+      img.style.animationPlayState = 'running';
+      img.style.willChange = 'auto';
+    });
+  });
+</script>
+
+</body>
+</html>
