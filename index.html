@@ -803,19 +803,24 @@
       jQuery('.video-container').fitVids();
     }
 
-    // 最简单的GIF重复播放方案
+    // 简单版本：每个GIF独立重播
     const gifImages = document.querySelectorAll('img[src*=".gif"]');
-    gifImages.forEach(img => {
+    gifImages.forEach((img, index) => {
       const originalSrc = img.src.split('?')[0];
       
-      // 每2秒刷新一次GIF
-      setInterval(() => {
-        const currentSrc = img.src;
-        img.src = '';
-        setTimeout(() => {
-          img.src = originalSrc + '?refresh=' + new Date().getTime();
-        }, 50);
-      }, 2000); // 2秒间隔，你可以根据GIF长度调整
+      // 重新播放这个GIF
+      const replayThisGif = () => {
+        img.src = originalSrc + '?t=' + Date.now();
+      };
+      
+      // 每个GIF有不同的重播间隔，避免同步
+      const interval = 6000 + (index * 500); // 6秒、6.5秒、7秒...
+      
+      // 立即播放
+      replayThisGif();
+      
+      // 设置独立的重播定时器
+      setInterval(replayThisGif, interval);
     });
   });
 </script>
