@@ -477,10 +477,15 @@
       transform: scale(1.02);
     }
 
-    /* Ensure GIF images loop properly */
+    /* 更新GIF样式 */
     img[src*=".gif"] {
+      image-rendering: auto !important;
       animation-play-state: running !important;
       will-change: auto !important;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      /* 确保GIF不被缓存影响 */
+      cache-control: no-cache;
     }
 
   
@@ -789,24 +794,35 @@
       jQuery('.video-container').fitVids();
     }
 
-    // Force GIF images to reload and loop properly
+    // 简单有效的GIF循环播放解决方案
     const gifImages = document.querySelectorAll('img[src*=".gif"]');
-    gifImages.forEach(img => {
-      // Force reload the GIF to ensure it loops
+    gifImages.forEach((img, index) => {
       const originalSrc = img.src;
-      img.onload = function() {
-        // Ensure the image loops by refreshing it periodically
+      
+      // 创建一个新的Image对象来预加载
+      const newImg = new Image();
+      newImg.onload = function() {
+        img.src = this.src;
+        img.style.opacity = '1';
+      };
+      
+      // 定期重新加载GIF
+      const reloadGif = () => {
+        img.style.opacity = '0';
         setTimeout(() => {
-          if (img.src === originalSrc) {
-            img.src = '';
-            img.src = originalSrc;
-          }
+          newImg.src = originalSrc + '?reload=' + Date.now();
         }, 100);
       };
       
-      // Ensure the image is visible and not affected by CSS transitions
-      img.style.animationPlayState = 'running';
-      img.style.willChange = 'auto';
+      // 设置初始样式
+      img.style.opacity = '0';
+      img.style.transition = 'opacity 0.5s ease';
+      
+      // 首次加载
+      newImg.src = originalSrc + '?initial=' + Date.now();
+      
+      // 定期重新加载（根据你的GIF长度调整间隔）
+      setInterval(reloadGif, 8000); // 8秒重新加载一次
     });
   });
 </script>
